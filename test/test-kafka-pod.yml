@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-kafka
+  labels:
+    app: test-kafka
+spec:
+  restartPolicy: Never
+  containers:
+    - name: kafka-tester
+      image: busybox:latest
+      command:
+        - "sh"
+        - "-c"
+        - "echo foo | grep foo"
