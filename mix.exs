@@ -14,13 +14,15 @@ defmodule StreamingService.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :kafka_ex],
+      mod: {StreamingService.Application, []}
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:kafka_ex, "~> 0.8.3"}
     ]
   end
 end

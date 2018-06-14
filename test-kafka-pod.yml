@@ -9,8 +9,4 @@ spec:
   restartPolicy: Never
   containers:
     - name: kafka-tester
-      image: busybox:latest
-      command:
-        - "sh"
-        - "-c"
-        - "echo foo | grep foo"
+      image: elixir:1.6.5-slim
