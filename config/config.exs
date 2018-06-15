@@ -2,7 +2,7 @@ use Mix.Config
 
 config :kafka_ex,
   brokers: [
-    {"my-cluster-kafka", 9092}
+    {"streaming-service-kafka", 9092}
   ],
   consumer_group: "kafka_ex",
   disable_default_worker: true,

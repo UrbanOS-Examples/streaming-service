@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: my-cluster
+  name: streaming-service
   labels:
     strimzi.io/kind: cluster
     strimzi.io/type: kafka
