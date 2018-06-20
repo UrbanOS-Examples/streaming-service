@@ -8,7 +8,6 @@ node {
     stage('Deploy Strimzi') {
         dir('k8s/strimzi') {
             sh 'kubectl apply -f cluster-operator/'
-            sh 'kubectl apply -f topic-operator/'
         }
     }
 
