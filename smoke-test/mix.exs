@@ -1,9 +1,9 @@
-defmodule StreamingService.MixProject do
+defmodule SmokeTestingService.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :streaming_service,
+      app: :smoke_testing_service,
       version: "0.1.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
@@ -11,18 +11,17 @@ defmodule StreamingService.MixProject do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger, :kafka_ex],
-      mod: {StreamingService.Application, []}
+      mod: {SmokeTestingService.Application, []}
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:kafka_ex, "~> 0.8.3"}
+      {:kafka_ex, "~> 0.8.3"},
+      {:checkov, github: "bbalser/checkov", tag: "0.1.0"},
     ]
   end
 end
