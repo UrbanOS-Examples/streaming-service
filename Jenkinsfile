@@ -64,20 +64,25 @@ node {
 
     stage ('Verify Smoke Test') {
         dir('smoke-test') {
-            timeout(10) {
-                sh('''\
-                    #!/usr/bin/env bash
-                    set -e
+            try {
+                timeout(10) {
+                    sh('''\
+                        #!/usr/bin/env bash
+                        set -e
 
-                    until kubectl logs -f kafka-smoke-tester 2>/dev/null; do
-                        echo "waiting for smoke test docker to start"
-                        sleep 1
-                    done
+                        until kubectl logs -f kafka-smoke-tester 2>/dev/null; do
+                            echo "waiting for smoke test docker to start"
+                            sleep 1
+                        done
 
-                    kubectl --output=json get pod kafka-smoke-tester \
-                        | jq -r '.status.phase' \
-                        | grep -qx "Succeeded"
-                '''.trim())
+                        kubectl --output=json get pod kafka-smoke-tester \
+                            | jq -r '.status.phase' \
+                            | grep -qx "Succeeded"
+                    '''.trim())
+                }
+            }
+            finally {
+                sh('kubectl delete -f k8s/')
             }
         }
     }
