@@ -4,8 +4,8 @@ config :kafka_ex,
   brokers: [
     {"streaming-service-kafka", 9092}
   ],
-  consumer_group: "kafka_ex",
-  disable_default_worker: true,
+  consumer_group: "smoke-test-kafka-consumer-group",
+  disable_default_worker: false,
   sync_timeout: 3000,
   max_restarts: 10,
   max_seconds: 60,
