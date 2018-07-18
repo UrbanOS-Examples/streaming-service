@@ -2,11 +2,6 @@ defmodule SmokeTestingServiceTest do
   use ExUnit.Case
   import Checkov
 
-  setup_all do
-    SmokeTestingService.connect()
-    :ok
-  end
-
   data_test "can produce and consume '#{message}' on topic '#{System.get_env("name")}'" do
     topic_name = System.get_env("name")
     {:ok, offset} = SmokeTestingService.produce_message(message, topic_name)

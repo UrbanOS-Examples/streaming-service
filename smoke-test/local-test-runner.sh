@@ -24,13 +24,14 @@ if ! minikube status; then
     minikube start --memory 8192
 fi
 
+kubectl config use-context minikube
 eval $(minikube docker-env)
 
 delete-smoke-test-resources
 trap "delete-smoke-test-resources" EXIT
 
 # manually change the k8s/01-deployment.yaml to `imagePullPolicy: Never` and to use this image
-docker build -t scos/streaming-service-smoke-test:local .
+docker build -t 199837183662.dkr.ecr.us-east-2.amazonaws.com/scos/streaming-service-smoke-test:local .
 
 kubectl apply -f ../k8s/strimzi/cluster-operator
 kubectl apply -f ../k8s/deployments

@@ -1,8 +1,4 @@
 defmodule SmokeTestingService do
-  def connect() do
-    KafkaEx.create_worker(:kafka_ex)
-  end
-
   def produce_message(message, topic_name) do
     KafkaEx.produce(topic_name, 0, message, required_acks: 1, timeout: 10_000)
   end

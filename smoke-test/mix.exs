@@ -14,14 +14,13 @@ defmodule SmokeTestingService.MixProject do
   def application do
     [
       extra_applications: [:logger, :kafka_ex],
-      mod: {SmokeTestingService.Application, []}
     ]
   end
 
   defp deps do
     [
       {:kafka_ex, "~> 0.8.3"},
-      {:checkov, github: "bbalser/checkov", tag: "0.1.0"},
+      {:checkov, "~> 0.2.0"},
     ]
   end
 end
