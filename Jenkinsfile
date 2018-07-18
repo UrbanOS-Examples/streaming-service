@@ -7,7 +7,8 @@ properties([
             name: 'kubernetesCreds',
             required: true
         )
-    ])
+    ]),
+    disableConcurrentBuilds()
 ])
 
 node {
