@@ -11,7 +11,7 @@ spec:
   restartPolicy: Never
   containers:
     - name: kafka-smoke-tester
-      image: 199837183662.dkr.ecr.us-east-2.amazonaws.com/scos/streaming-service-smoke-test:latest
+      image: 199837183662.dkr.ecr.us-east-2.amazonaws.com/scos/streaming-service-smoke-test:%VERSION%
       imagePullPolicy: IfNotPresent
       envFrom:
         - configMapRef:

@@ -49,6 +49,7 @@ node {
 
     stage('Run Smoke Tester') {
         dir('smoke-test') {
+            sh("sed -i 's/%VERSION%/${GIT_COMMIT_HASH}/' k8s/01-deployment.yaml")
             kubernetesDeploy(
                 kubeconfigId: "${params.kubernetesCreds}",
                 configs: 'k8s/*',
