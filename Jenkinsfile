@@ -1,16 +1,3 @@
-properties([
-    parameters([
-        credentials(
-            credentialType: 'com.microsoft.jenkins.kubernetes.credentials.KubeconfigCredentials',
-            defaultValue: 'kubeconfig-dev',
-            description: 'Environment to deploy to',
-            name: 'kubernetesCreds',
-            required: true
-        )
-    ]),
-    disableConcurrentBuilds()
-])
-
 def image
 def scmVars
 
@@ -55,7 +42,7 @@ node {
             dir('smoke-test') {
                 sh("sed -i 's/%VERSION%/${GIT_COMMIT_HASH}/' k8s/01-deployment.yaml")
                 kubernetesDeploy(
-                    kubeconfigId: "${params.kubernetesCreds}",
+                    kubeconfigId: 'kubeconfig-dev',
                     configs: 'k8s/*',
                     secretName: 'regcred',
                     dockerCredentials: [
