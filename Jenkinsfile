@@ -1,22 +1,17 @@
 def image
-def scmVars
 
 node {
     stage('Checkout') {
-        scmVars = checkout scm
-        GIT_COMMIT_HASH = sh(
-            script: 'git rev-parse HEAD',
-            returnStdout: true
-        ).trim()
+        env.GIT_COMMIT_HASH = checkout(scm).GIT_COMMIT
     }
 
     stage('Build Smoke Tester') {
         dir('smoke-test') {
-            image = docker.build("scos/streaming-service-smoke-test:${GIT_COMMIT_HASH}")
+            image = docker.build("scos/streaming-service-smoke-test:${env.GIT_COMMIT_HASH}")
         }
     }
 
-    if (scmVars.GIT_BRANCH == 'master') {
+    if (env.BRANCH_NAME == 'master') {
         stage('Publish Smoke Tester') {
             dir('smoke-test') {
                 docker.withRegistry("https://199837183662.dkr.ecr.us-east-2.amazonaws.com", "ecr:us-east-2:aws_jenkins_user") {
@@ -40,7 +35,7 @@ node {
 
         stage('Run Smoke Tester') {
             dir('smoke-test') {
-                sh("sed -i 's/%VERSION%/${GIT_COMMIT_HASH}/' k8s/01-deployment.yaml")
+                sh("sed -i 's/%VERSION%/${env.GIT_COMMIT_HASH}/' k8s/01-deployment.yaml")
                 kubernetesDeploy(
                     kubeconfigId: 'kubeconfig-dev',
                     configs: 'k8s/*',
