@@ -1,3 +1,10 @@
+library(
+    identifier: 'pipeline-lib@master',
+    retriever: modernSCM([$class: 'GitSCMSource',
+                          remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
+                          credentialsId: 'jenkins-github-user'])
+)
+
 def image
 
 node {
@@ -26,23 +33,26 @@ node {
     }
 
     stage('Deploy to Dev') {
-        def cluster = 'dev'
-        deployStrimzi(cluster)
-        deployKafka(cluster)
-        runSmokeTest(cluster)
+        scos.onKubernetes('dev') {
+            deployStrimzi()
+            deployKafka()
+            runSmokeTest()
+        }
     }
 
     if (env.BRANCH_NAME == 'master') {
         def tag = "RC-${new Date().format("yyyy.MM.dd.HHmmss")}"
+
         stage('Deploy to Staging'){
+            scos.onKubernetes('staging') {
+                deployStrimzi()
+                deployKafka()
+                runSmokeTest()
+            }
+
             sh "git tag ${tag}"
-
-            def cluster = 'staging'
-            deployStrimzi(cluster)
-            deployKafka(cluster)
-            runSmokeTest(cluster)
-
             sh "git push github ${tag}"
+
             withDockerRegistry {
                 image.push(tag)
             }
@@ -50,53 +60,37 @@ node {
     }
 }
 
-/*
- * The k8s deployments use raw kubectl commands because the plugin we use
- * for other projects doesn't support the creation of role based auth.
- * The Strimzi deployment creates roles.
- */
-def deployStrimzi(environment) {
+def deployStrimzi() {
     dir('k8s/strimzi') {
-        sh "kubectl apply --kubeconfig=${kubeConfigPath(environment)} -f cluster-operator/"
+        sh "kubectl apply -f cluster-operator/"
     }
 }
 
-def deployKafka(environment) {
+def deployKafka() {
     dir('k8s') {
-        sh "kubectl apply --kubeconfig=${kubeConfigPath(environment)} -f deployments/"
+        sh "kubectl apply -f deployments/"
     }
 }
 
-def runSmokeTest(environment) {
-    deploySmokeTest(environment)
-    verifySmokeTest(environment)
+def runSmokeTest() {
+    deploySmokeTest()
+    verifySmokeTest()
 }
 
-def deploySmokeTest(environment) {
+def deploySmokeTest() {
     dir('smoke-test') {
         sh("sed -i 's/%VERSION%/${env.GIT_COMMIT_HASH}/' k8s/01-deployment.yaml")
-        kubernetesDeploy(
-            kubeconfigId: "kubeconfig-${environment}",
-            configs: 'k8s/*',
-            secretName: 'regcred',
-            dockerCredentials: [
-                [
-                    credentialsId: 'ecr:us-east-2:aws_jenkins_user',
-                    url: 'https://199837183662.dkr.ecr.us-east-2.amazonaws.com'
-                ],
-            ]
-        )
+        sh("kubectl apply -f k8s/")
     }
 }
 
-def verifySmokeTest(environment) {
+def verifySmokeTest() {
     dir('smoke-test') {
         try {
             timeout(10) {
                 sh("""\
                     #!/usr/bin/env bash
                     set -e
-                    export KUBECONFIG=${kubeConfigPath(environment)}
                     until kubectl logs -f kafka-smoke-tester 2>/dev/null; do
                         echo "waiting for smoke test docker to start"
                         sleep 1
@@ -109,13 +103,9 @@ def verifySmokeTest(environment) {
             }
         }
         finally {
-            sh("kubectl delete --kubeconfig=${kubeConfigPath(environment)} -f k8s/")
+            sh("kubectl delete -f k8s/")
         }
     }
-}
-
-def kubeConfigPath(environment) {
-    "/var/jenkins_home/.kube/${environment}/config"
 }
 
 def withDockerRegistry(Closure func) {
