@@ -33,7 +33,7 @@ node {
     }
 
     stage('Deploy to Dev') {
-        scos.onKubernetes('dev') {
+        scos.withEksCredentials('dev') {
             deployStrimzi()
             deployKafka()
             runSmokeTest()
@@ -44,7 +44,7 @@ node {
         def tag = "RC-${new Date().format("yyyy.MM.dd.HHmmss")}"
 
         stage('Deploy to Staging'){
-            scos.onKubernetes('staging') {
+            scos.withEksCredentials('staging') {
                 deployStrimzi()
                 deployKafka()
                 runSmokeTest()
