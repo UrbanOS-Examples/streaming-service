@@ -25,7 +25,7 @@ node {
 
     stage('Publish Smoke Tester') {
         dir('smoke-test') {
-            withDockerRegistry {
+            scos.withDockerRegistry {
                 image.push()
                 image.push('latest')
             }
@@ -41,7 +41,7 @@ node {
     }
 
     if (env.BRANCH_NAME == 'master') {
-        def tag = "RC-${new Date().format("yyyy.MM.dd.HHmmss")}"
+        def tag = scos.releaseCandidateNumber()
 
         stage('Deploy to Staging'){
             scos.withEksCredentials('staging') {
@@ -53,7 +53,7 @@ node {
             sh "git tag ${tag}"
             sh "git push github ${tag}"
 
-            withDockerRegistry {
+            scos.withDockerRegistry {
                 image.push(tag)
             }
         }
@@ -105,11 +105,5 @@ def verifySmokeTest() {
         finally {
             sh("kubectl delete -f k8s/")
         }
-    }
-}
-
-def withDockerRegistry(Closure func) {
-    docker.withRegistry("https://199837183662.dkr.ecr.us-east-2.amazonaws.com", "ecr:us-east-2:aws_jenkins_user") {
-        func()
     }
 }
