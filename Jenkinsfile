@@ -5,6 +5,8 @@ library(
                           credentialsId: 'jenkins-github-user'])
 )
 
+// comment
+
 def image
 
 node {
