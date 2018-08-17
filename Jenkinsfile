@@ -1,60 +1,78 @@
 library(
-    identifier: 'pipeline-lib@master',
+    identifier: 'pipeline-lib@1.2.1',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
 )
 
-def image
+def smokeTestImage
+def currentTagIsReadyForProduction = scos.isRelease(env.BRANCH_NAME)
+def currentTagIsReadyForStaging = env.BRANCH_NAME == "master"
+def doStageIf = scos.&doStageIf
 
-node {
-    stage('Checkout') {
-        deleteDir()
-        env.GIT_COMMIT_HASH = checkout(scm).GIT_COMMIT
+node('master') {
+    ansiColor('xterm') {
+        stage('Checkout') {
+            deleteDir()
+            env.GIT_COMMIT_HASH = checkout(scm).GIT_COMMIT
 
-        withCredentials([usernamePassword(credentialsId: 'jenkins-github-user', passwordVariable: 'GIT_PWD', usernameVariable: 'GIT_USER')]) {
-            sh 'git remote add github https://$GIT_USER:$GIT_PWD@github.com/SmartColumbusOS/streaming-service.git'
+            scos.addGitHubRemoteForTagging("SmartColumbusOS/streaming-service.git")
         }
-    }
 
-    stage('Build Smoke Tester') {
-        dir('smoke-test') {
-            image = docker.build("scos/streaming-service-smoke-test:${env.GIT_COMMIT_HASH}")
-        }
-    }
-
-    stage('Publish Smoke Tester') {
-        dir('smoke-test') {
-            scos.withDockerRegistry {
-                image.push()
-                image.push('latest')
+        stage('Build Smoke Tester') {
+            dir('smoke-test') {
+                smokeTestImage = docker.build("scos/streaming-service-smoke-test:${env.GIT_COMMIT_HASH}")
             }
         }
-    }
 
-    stage('Deploy to Dev') {
-        scos.withEksCredentials('dev') {
-            deployStrimzi()
-            deployKafka()
-            runSmokeTest()
+        stage('Publish Smoke Tester') {
+            dir('smoke-test') {
+                scos.withDockerRegistry {
+                    smokeTestImage.push()
+                    smokeTestImage.push('latest')
+                }
+            }
         }
-    }
 
-    if (env.BRANCH_NAME == 'master') {
-        def tag = scos.releaseCandidateNumber()
+        doStageIf(!currentTagIsReadyForProduction, 'Deploy to Dev') {
+            scos.withEksCredentials('dev') {
+                deployStrimzi()
+                deployKafka()
+                runSmokeTest()
+            }
+        }
 
-        stage('Deploy to Staging'){
+        doStageIf(currentTagIsReadyForStaging, 'Deploy to Staging') {
+            def promotionTag = scos.releaseCandidateNumber()
+
             scos.withEksCredentials('staging') {
                 deployStrimzi()
                 deployKafka()
                 runSmokeTest()
             }
 
-            sh "git tag ${tag}"
-            sh "git push github ${tag}"
+            scos.applyAndPushGitHubTag(promotionTag)
 
             scos.withDockerRegistry {
-                image.push(tag)
+                smokeTestImage.push(promotionTag)
+            }
+        }
+
+        doStageIf(currentTagIsReadyForProduction, 'Deploy to Production') {
+            def currentTag = env.BRANCH_NAME
+            def promotionTag = 'prod'
+
+            scos.withEksCredentials(promotionTag) {
+                deployStrimzi()
+                deployKafka()
+                runSmokeTest(currentTag)
+            }
+
+            scos.applyAndPushGitHubTag(promotionTag)
+
+            scos.withDockerRegistry {
+                smokeTestImage = scos.pullImageFromDockerRegistry("scos/streaming-service-smoke-test", currentTag)
+                smokeTestImage.push(promotionTag)
             }
         }
     }
@@ -72,14 +90,14 @@ def deployKafka() {
     }
 }
 
-def runSmokeTest() {
-    deploySmokeTest()
+def runSmokeTest(dockerImageVersion=env.GIT_COMMIT_HASH) {
+    deploySmokeTest(dockerImageVersion)
     verifySmokeTest()
 }
 
-def deploySmokeTest() {
+def deploySmokeTest(dockerImageVersion) {
     dir('smoke-test') {
-        sh("sed -i 's/%VERSION%/${env.GIT_COMMIT_HASH}/' k8s/01-deployment.yaml")
+        sh("sed -i 's/%VERSION%/${dockerImageVersion}/' k8s/01-deployment.yaml")
         sh("kubectl apply -f k8s/")
     }
 }
