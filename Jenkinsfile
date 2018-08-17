@@ -19,13 +19,13 @@ node('master') {
             scos.addGitHubRemoteForTagging("SmartColumbusOS/streaming-service.git")
         }
 
-        stage('Build Smoke Tester') {
+        doStageIf(!currentTagIsReadyForProduction, 'Build Smoke Tester') {
             dir('smoke-test') {
                 smokeTestImage = docker.build("scos/streaming-service-smoke-test:${env.GIT_COMMIT_HASH}")
             }
         }
 
-        stage('Publish Smoke Tester') {
+        doStageIf(!currentTagIsReadyForProduction, 'Publish Smoke Tester') {
             dir('smoke-test') {
                 scos.withDockerRegistry {
                     smokeTestImage.push()
