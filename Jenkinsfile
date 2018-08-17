@@ -7,7 +7,7 @@ library(
 
 def smokeTestImage
 def currentTagIsReadyForProduction = scos.isRelease(env.BRANCH_NAME)
-def currentTagIsReadyForStaging = env.BRANCH_NAME == "master"
+def currentTagIsReadyForStaging = (env.BRANCH_NAME == "master")
 def doStageIf = scos.&doStageIf
 
 node('master') {
