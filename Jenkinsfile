@@ -59,19 +59,20 @@ node('master') {
         }
 
         doStageIf(currentTagIsReadyForProduction, 'Deploy to Production') {
-            def currentTag = env.BRANCH_NAME
+            def releaseTag = env.BRANCH_NAME
             def promotionTag = 'prod'
 
-            scos.withEksCredentials(promotionTag) {
+            scos.withEksCredentials('prod') {
                 deployStrimzi()
                 deployKafka()
-                runSmokeTest(currentTag)
+                runSmokeTest()
             }
 
             scos.applyAndPushGitHubTag(promotionTag)
 
             scos.withDockerRegistry {
-                smokeTestImage = scos.pullImageFromDockerRegistry("scos/streaming-service-smoke-test", currentTag)
+                smokeTestImage = scos.pullImageFromDockerRegistry("scos/streaming-service-smoke-test", env.GIT_COMMIT_HASH)
+                smokeTestImage.push(releaseTag)
                 smokeTestImage.push(promotionTag)
             }
         }
@@ -90,14 +91,14 @@ def deployKafka() {
     }
 }
 
-def runSmokeTest(dockerImageVersion=env.GIT_COMMIT_HASH) {
-    deploySmokeTest(dockerImageVersion)
+def runSmokeTest() {
+    deploySmokeTest()
     verifySmokeTest()
 }
 
-def deploySmokeTest(dockerImageVersion) {
+def deploySmokeTest() {
     dir('smoke-test') {
-        sh("sed -i 's/%VERSION%/${dockerImageVersion}/' k8s/01-deployment.yaml")
+        sh("sed -i 's/%VERSION%/${env.GIT_COMMIT_HASH}/' k8s/01-deployment.yaml")
         sh("kubectl apply -f k8s/")
     }
 }
