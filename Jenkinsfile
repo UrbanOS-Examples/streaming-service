@@ -6,9 +6,10 @@ library(
 )
 
 def smokeTestImage
-def currentTagIsReadyForProduction = scos.isRelease(env.BRANCH_NAME)
-def currentTagIsReadyForStaging = (env.BRANCH_NAME == "master")
 def doStageIf = scos.&doStageIf
+def doStageIfRelease = doStageIf.curry(scos.isRelease(env.BRANCH_NAME))
+def doStageUnlessRelease = doStageIf.curry(!scos.isRelease(env.BRANCH_NAME))
+def doStageIfPromoted = doStageIf.curry(env.BRANCH_NAME == 'master')
 
 node('master') {
     ansiColor('xterm') {
@@ -19,13 +20,13 @@ node('master') {
             scos.addGitHubRemoteForTagging("SmartColumbusOS/streaming-service.git")
         }
 
-        doStageIf(!currentTagIsReadyForProduction, 'Build Smoke Tester') {
+        doStageUnlessRelease('Build Smoke Tester') {
             dir('smoke-test') {
                 smokeTestImage = docker.build("scos/streaming-service-smoke-test:${env.GIT_COMMIT_HASH}")
             }
         }
 
-        doStageIf(!currentTagIsReadyForProduction, 'Publish Smoke Tester') {
+        doStageUnlessRelease('Publish Smoke Tester') {
             dir('smoke-test') {
                 scos.withDockerRegistry {
                     smokeTestImage.push()
@@ -34,7 +35,7 @@ node('master') {
             }
         }
 
-        doStageIf(!currentTagIsReadyForProduction, 'Deploy to Dev') {
+        doStageUnlessRelease('Deploy to Dev') {
             scos.withEksCredentials('dev') {
                 deployStrimzi()
                 deployKafka()
@@ -42,7 +43,7 @@ node('master') {
             }
         }
 
-        doStageIf(currentTagIsReadyForStaging, 'Deploy to Staging') {
+        doStageIfPromoted('Deploy to Staging') {
             def promotionTag = scos.releaseCandidateNumber()
 
             scos.withEksCredentials('staging') {
@@ -58,7 +59,7 @@ node('master') {
             }
         }
 
-        doStageIf(currentTagIsReadyForProduction, 'Deploy to Production') {
+        doStageIfRelease('Deploy to Production') {
             def releaseTag = env.BRANCH_NAME
             def promotionTag = 'prod'
 
