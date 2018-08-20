@@ -1,60 +1,80 @@
 library(
-    identifier: 'pipeline-lib@master',
+    identifier: 'pipeline-lib@1.2.1',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
 )
 
-def image
+def smokeTestImage
+def doStageIf = scos.&doStageIf
+def doStageIfRelease = doStageIf.curry(scos.isRelease(env.BRANCH_NAME))
+def doStageUnlessRelease = doStageIf.curry(!scos.isRelease(env.BRANCH_NAME))
+def doStageIfPromoted = doStageIf.curry(env.BRANCH_NAME == 'master')
 
-node {
-    stage('Checkout') {
-        deleteDir()
-        env.GIT_COMMIT_HASH = checkout(scm).GIT_COMMIT
+node('master') {
+    ansiColor('xterm') {
+        stage('Checkout') {
+            deleteDir()
+            env.GIT_COMMIT_HASH = checkout(scm).GIT_COMMIT
 
-        withCredentials([usernamePassword(credentialsId: 'jenkins-github-user', passwordVariable: 'GIT_PWD', usernameVariable: 'GIT_USER')]) {
-            sh 'git remote add github https://$GIT_USER:$GIT_PWD@github.com/SmartColumbusOS/streaming-service.git'
+            scos.addGitHubRemoteForTagging("SmartColumbusOS/streaming-service.git")
         }
-    }
 
-    stage('Build Smoke Tester') {
-        dir('smoke-test') {
-            image = docker.build("scos/streaming-service-smoke-test:${env.GIT_COMMIT_HASH}")
-        }
-    }
-
-    stage('Publish Smoke Tester') {
-        dir('smoke-test') {
-            scos.withDockerRegistry {
-                image.push()
-                image.push('latest')
+        doStageUnlessRelease('Build Smoke Tester') {
+            dir('smoke-test') {
+                smokeTestImage = docker.build("scos/streaming-service-smoke-test:${env.GIT_COMMIT_HASH}")
             }
         }
-    }
 
-    stage('Deploy to Dev') {
-        scos.withEksCredentials('dev') {
-            deployStrimzi()
-            deployKafka()
-            runSmokeTest()
+        doStageUnlessRelease('Publish Smoke Tester') {
+            dir('smoke-test') {
+                scos.withDockerRegistry {
+                    smokeTestImage.push()
+                    smokeTestImage.push('latest')
+                }
+            }
         }
-    }
 
-    if (env.BRANCH_NAME == 'master') {
-        def tag = scos.releaseCandidateNumber()
+        doStageUnlessRelease('Deploy to Dev') {
+            scos.withEksCredentials('dev') {
+                deployStrimzi()
+                deployKafka()
+                runSmokeTest()
+            }
+        }
 
-        stage('Deploy to Staging'){
+        doStageIfPromoted('Deploy to Staging') {
+            def promotionTag = scos.releaseCandidateNumber()
+
             scos.withEksCredentials('staging') {
                 deployStrimzi()
                 deployKafka()
                 runSmokeTest()
             }
 
-            sh "git tag ${tag}"
-            sh "git push github ${tag}"
+            scos.applyAndPushGitHubTag(promotionTag)
 
             scos.withDockerRegistry {
-                image.push(tag)
+                smokeTestImage.push(promotionTag)
+            }
+        }
+
+        doStageIfRelease('Deploy to Production') {
+            def releaseTag = env.BRANCH_NAME
+            def promotionTag = 'prod'
+
+            scos.withEksCredentials('prod') {
+                deployStrimzi()
+                deployKafka()
+                runSmokeTest()
+            }
+
+            scos.applyAndPushGitHubTag(promotionTag)
+
+            scos.withDockerRegistry {
+                smokeTestImage = scos.pullImageFromDockerRegistry("scos/streaming-service-smoke-test", env.GIT_COMMIT_HASH)
+                smokeTestImage.push(releaseTag)
+                smokeTestImage.push(promotionTag)
             }
         }
     }
