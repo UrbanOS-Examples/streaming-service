@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@1.2.1',
+    identifier: 'pipeline-lib@2.0.1',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -11,7 +11,7 @@ def doStageIfRelease = doStageIf.curry(scos.isRelease(env.BRANCH_NAME))
 def doStageUnlessRelease = doStageIf.curry(!scos.isRelease(env.BRANCH_NAME))
 def doStageIfPromoted = doStageIf.curry(env.BRANCH_NAME == 'master')
 
-node('master') {
+node('infrastructure') {
     ansiColor('xterm') {
         stage('Checkout') {
             deleteDir()
@@ -127,3 +127,4 @@ def verifySmokeTest() {
         }
     }
 }
+
