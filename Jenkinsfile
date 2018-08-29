@@ -1,5 +1,5 @@
 library(
-    identifier: 'pipeline-lib@2.0.1',
+    identifier: 'pipeline-lib@3.0.0',
     retriever: modernSCM([$class: 'GitSCMSource',
                           remote: 'https://github.com/SmartColumbusOS/pipeline-lib',
                           credentialsId: 'jenkins-github-user'])
@@ -13,12 +13,7 @@ def doStageIfPromoted = doStageIf.curry(env.BRANCH_NAME == 'master')
 
 node('infrastructure') {
     ansiColor('xterm') {
-        stage('Checkout') {
-            deleteDir()
-            env.GIT_COMMIT_HASH = checkout(scm).GIT_COMMIT
-
-            scos.addGitHubRemoteForTagging("SmartColumbusOS/streaming-service.git")
-        }
+        scos.doCheckoutStage()
 
         doStageUnlessRelease('Build Smoke Tester') {
             dir('smoke-test') {
