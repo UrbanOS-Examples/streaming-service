@@ -98,7 +98,7 @@ def runSmokeTest() {
 
 def deploySmokeTest() {
     dir('smoke-test') {
-        sh("sed -i 's/%VERSION%/${env.GIT_COMMIT_HASH}/' k8s/01-deployment.yaml")
+        sh("""sed -i "s/%VERSION%/${env.GIT_COMMIT_HASH}/" k8s/01-deployment.yaml""")
         sh("kubectl apply -f k8s/")
     }
 }
