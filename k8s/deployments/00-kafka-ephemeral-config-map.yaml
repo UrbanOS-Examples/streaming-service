@@ -35,6 +35,17 @@ data:
           }
       ]
     }
+  kafka-resources: |-
+    {
+      "requests": {
+        "cpu": "1",
+        "memory": "2Gi"
+      },
+      "limits": {
+        "cpu": "1",
+        "memory": "2Gi"
+      }
+    }
   zookeeper-nodes: "3"
   zookeeper-healthcheck-delay: "15"
   zookeeper-healthcheck-timeout: "5"
@@ -44,5 +55,27 @@ data:
     {
       "lowercaseOutputName": true
     }
+  zookeeper-resources: |-
+    {
+      "requests": {
+        "cpu": "0.25",
+        "memory": "256Mi"
+      },
+      "limits": {
+        "cpu": "0.25",
+        "memory": "256Mi"
+      }
+    }
   topic-operator-config: |-
     { }
+  topic-operator-resources: |-
+    {
+      "requests": {
+        "cpu": "0.25",
+        "memory": "256Mi"
+      },
+      "limits": {
+        "cpu": "0.25",
+        "memory": "256Mi"
+      }
+    }

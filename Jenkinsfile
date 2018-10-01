@@ -80,14 +80,16 @@ node('infrastructure') {
 }
 
 def deployStrimzi() {
-    dir('k8s/strimzi') {
-        sh "kubectl apply -f cluster-operator/"
+    dir('k8s') {
+        sh "kubectl get namespaces | egrep '^streaming ' || kubectl create namespace streaming"
+        sh "kubectl apply --namespace streaming -f limits/"
+        sh "kubectl apply --namespace streaming -f strimzi/cluster-operator/"
     }
 }
 
 def deployKafka() {
     dir('k8s') {
-        sh "kubectl apply -f deployments/"
+        sh "kubectl apply --namespace streaming -f deployments/"
     }
 }
 
@@ -99,7 +101,7 @@ def runSmokeTest() {
 def deploySmokeTest() {
     dir('smoke-test') {
         sh("""sed -i "s/%VERSION%/${env.GIT_COMMIT_HASH}/" k8s/01-deployment.yaml""")
-        sh("kubectl apply -f k8s/")
+        sh("kubectl apply --namespace streaming -f k8s/")
     }
 }
 
@@ -110,20 +112,19 @@ def verifySmokeTest() {
                 sh("""\
                     #!/usr/bin/env bash
                     set -e
-                    until kubectl logs -f kafka-smoke-tester 2>/dev/null; do
+                    until kubectl logs --namespace streaming -f kafka-smoke-tester 2>/dev/null; do
                         echo "waiting for smoke test docker to start"
                         sleep 1
                     done
 
-                    kubectl --output=json get pod kafka-smoke-tester \
+                    kubectl --output=json get pod kafka-smoke-tester --namespace streaming \
                         | jq -r '.status.phase' \
                         | grep -qx "Succeeded"
                 """.trim())
             }
         }
         finally {
-            sh("kubectl delete -f k8s/")
+            sh("kubectl delete --namespace streaming -f k8s/")
         }
     }
 }
-
