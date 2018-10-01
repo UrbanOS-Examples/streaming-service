@@ -80,9 +80,10 @@ node('infrastructure') {
 }
 
 def deployStrimzi() {
-    dir('k8s/strimzi') {
+    dir('k8s') {
         sh "kubectl create namespace streaming || echo Ignoring AlreadyExists error"
-        sh "kubectl apply --namespace streaming -f cluster-operator/"
+        sh "kubectl apply --namespace streaming -f limits/"
+        sh "kubectl apply --namespace streaming -f strimzi/cluster-operator/"
     }
 }
 
