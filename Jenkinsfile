@@ -81,13 +81,14 @@ node('infrastructure') {
 
 def deployStrimzi() {
     dir('k8s/strimzi') {
-        sh "kubectl apply -f cluster-operator/"
+        sh "kubectl create namespace streaming || echo Ignoring AlreadyExists error"
+        sh "kubectl apply --namespace streaming -f cluster-operator/"
     }
 }
 
 def deployKafka() {
     dir('k8s') {
-        sh "kubectl apply -f deployments/"
+        sh "kubectl apply --namespace streaming -f deployments/"
     }
 }
 
@@ -99,7 +100,7 @@ def runSmokeTest() {
 def deploySmokeTest() {
     dir('smoke-test') {
         sh("""sed -i "s/%VERSION%/${env.GIT_COMMIT_HASH}/" k8s/01-deployment.yaml""")
-        sh("kubectl apply -f k8s/")
+        sh("kubectl apply --namespace streaming -f k8s/")
     }
 }
 
@@ -122,8 +123,7 @@ def verifySmokeTest() {
             }
         }
         finally {
-            sh("kubectl delete -f k8s/")
+            sh("kubectl delete --namespace streaming -f k8s/")
         }
     }
 }
-
