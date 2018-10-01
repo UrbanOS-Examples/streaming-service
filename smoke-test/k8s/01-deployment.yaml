@@ -13,12 +13,26 @@ spec:
     - name: kafka-smoke-tester
       image: 199837183662.dkr.ecr.us-east-2.amazonaws.com/scos/streaming-service-smoke-test:%VERSION%
       imagePullPolicy: IfNotPresent
+      resources:
+        limits:
+          memory: 256Mi
+          cpu: 100m
+        requests:
+          memory: 256Mi
+          cpu: 100m
       envFrom:
         - configMapRef:
             name: smoke-test-topic
   initContainers:
     - name: wait-for-kafka
       image: busybox
+      resources:
+        limits:
+          memory: 64Mi
+          cpu: 10m
+        requests:
+          memory: 64Mi
+          cpu: 10m
       envFrom:
         - configMapRef:
             name: smoke-test-topic
