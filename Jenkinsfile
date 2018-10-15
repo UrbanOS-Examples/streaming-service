@@ -80,17 +80,13 @@ node('infrastructure') {
 }
 
 def deployStrimzi() {
-    dir('k8s') {
-        sh "kubectl apply -f namespace.yaml"
-        sh "kubectl apply --namespace streaming -f limits/"
-        sh "kubectl apply --namespace streaming -f strimzi/cluster-operator/"
-    }
+    sh "kubectl apply -f k8s/namespace.yml"
+    sh "helm repo add strimzi http://strimzi.io/charts/"
+    sh "helm upgrade --install strimzi-kafka-operator strimzi/strimzi-kafka-operator --version 0.8.0 -f strimzi-config.yml"
 }
 
 def deployKafka() {
-    dir('k8s') {
-        sh "kubectl apply --namespace streaming -f deployments/"
-    }
+    sh "helm upgrade --install streaming-service-kafka chart/ --namespace streaming"
 }
 
 def runSmokeTest() {
