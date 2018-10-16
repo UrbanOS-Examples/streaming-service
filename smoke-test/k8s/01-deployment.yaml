@@ -20,9 +20,9 @@ spec:
         requests:
           memory: 256Mi
           cpu: 100m
-      envFrom:
-        - configMapRef:
-            name: smoke-test-topic
+      env:
+        - name: name
+          value: smoke-test-topic
   initContainers:
     - name: wait-for-kafka
       image: busybox
@@ -33,9 +33,9 @@ spec:
         requests:
           memory: 64Mi
           cpu: 10m
-      envFrom:
-        - configMapRef:
-            name: smoke-test-topic
+      env:
+        - name: name
+          value: smoke-test-topic
       command:
         - sh
         - -c
