@@ -1,0 +1,1 @@
+role_arn = "arn:aws:iam::068920858268:role/admin_role"
