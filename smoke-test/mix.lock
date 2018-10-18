@@ -1,4 +1,0 @@
-%{
-  "checkov": {:git, "https://github.com/bbalser/checkov.git", "c0eeecc82eed411c1acb40bc3f74300aecf21504", [tag: "0.1.0"]},
-  "kafka_ex": {:hex, :kafka_ex, "0.8.3", "16946ec8c50adf8ff5b858b28cff85ed93b16785004b2be1c9959cd2d704a462", [:mix], [], "hexpm"},
-}
