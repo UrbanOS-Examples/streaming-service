@@ -13,8 +13,8 @@ spec:
       containers:
       - name: smoke-test-consumer
         image: ryane/kafkacat
-        command: ["bash", "-c", "kafkacat -C -b streaming-service-kafka-bootstrap -t smoke-test -e"]
+        command: ["bash", "-c", "kafkacat -C -b {{ .Values.kafka.deploymentName }}-kafka-bootstrap -t smoke-test -e"]
       - name: smoke-test-producer
         image: ryane/kafkacat
-        command: ["bash", "-c", "echo 'foo' | kafkacat -P -b streaming-service-kafka-bootstrap -t smoke-test"]
+        command: ["bash", "-c", "echo 'foo' | kafkacat -P -b {{ .Values.kafka.deploymentName }}-kafka-bootstrap -t smoke-test"]
       restartPolicy: OnFailure

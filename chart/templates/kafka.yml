@@ -1,7 +1,7 @@
 apiVersion: kafka.strimzi.io/v1alpha1
 kind: Kafka
 metadata:
-  name: streaming-service
+  name: "{{ .Values.kafka.deploymentName }}"
 spec:
   kafka:
     replicas: 3
@@ -9,7 +9,8 @@ spec:
       plain: {}
       tls: {}
     config:
-      offsets.topic.replication.factor: 3
+      default.replication.factor: 3
+      offsets.topic.replication.factor: 30
       transaction.state.log.replication.factor: 3
       transaction.state.log.min.isr: 2
     storage:

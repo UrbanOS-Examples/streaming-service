@@ -1,3 +1,2 @@
-strimzi-kafka-operator:
-  watchNamespaces:
-    - "streaming-service"
+kafka:
+  deploymentName: streaming-service
