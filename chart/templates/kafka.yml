@@ -10,7 +10,7 @@ spec:
       tls: {}
     config:
       default.replication.factor: 3
-      offsets.topic.replication.factor: 30
+      offsets.topic.replication.factor: 3
       transaction.state.log.replication.factor: 3
       transaction.state.log.min.isr: 2
     storage:
