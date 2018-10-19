@@ -9,6 +9,7 @@ spec:
       plain: {}
       tls: {}
     config:
+      num.partitions: 30
       default.replication.factor: 3
       offsets.topic.replication.factor: 3
       transaction.state.log.replication.factor: 3
