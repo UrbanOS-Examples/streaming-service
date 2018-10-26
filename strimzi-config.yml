@@ -1,3 +1,9 @@
 watchNamespaces:
   - streaming
   - streaming-prime
+
+resources:
+  limits:
+    cpu: 100m
+  requests:
+    cpu: 10m
