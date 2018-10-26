@@ -43,10 +43,10 @@ spec:
       deleteClaim: false
     resources:
       requests:
-        cpu: "250m"
+        cpu: 10m
         memory: 512Mi
       limits:
-        cpu: "250m"
+        cpu: 100m
         memory: 512Mi
     tlsSidecar:
 {{ toYaml .Values.tlsSidecar | indent 6 }}
