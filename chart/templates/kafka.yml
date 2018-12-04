@@ -19,6 +19,9 @@ spec:
       type: persistent-claim
       size: {{ .Values.kafka.storageSize }}
       deleteClaim: false
+    # enables default kafka metrics
+    # http://strimzi.io/docs/0.8.0/#assembly-metrics-deployment-configuration-kafka
+    metrics: {}
     resources:
       requests:
         cpu: 100m
