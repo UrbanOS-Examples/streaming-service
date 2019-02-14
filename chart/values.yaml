@@ -1,6 +1,10 @@
 kafka:
   deploymentName: streaming-service
   storageSize: 100Gi
+  topics:
+  - name: smoke-test
+    partitions: 3
+    replicas: 2
 
 tlsSidecar:
   resources:
