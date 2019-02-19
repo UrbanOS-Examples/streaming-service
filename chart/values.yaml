@@ -1,10 +1,14 @@
 kafka:
-  deploymentName: streaming-service
+  strimziCluster: streaming-service
   storageSize: 100Gi
+  defaultPartitions: 3
+  defaultReplicas: 2
   topics:
   - name: smoke-test
-    partitions: 3
-    replicas: 2
+  - name: dataset-registry
+  - name: streaming-og
+  - name: streaming-transformed
+  - name: streaming-validated
 
 tlsSidecar:
   resources:
