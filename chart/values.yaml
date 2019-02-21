@@ -7,8 +7,9 @@ kafka:
   - name: smoke-test
   - name: dataset-registry
   - name: streaming-og
-  - name: streaming-transformed
+  - name: streaming-raw
   - name: streaming-validated
+  - name: streaming-transformed
 
 tlsSidecar:
   resources:
