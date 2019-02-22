@@ -59,4 +59,5 @@ def deployStrimzi() {
 
 def deployKafka() {
     sh "helm upgrade --install streaming-service-kafka-prime chart/ --namespace streaming-prime --timeout 600"
+    sh "helm upgrade --install streaming-service-kafka-public chart/ --namespace streaming-public -f ./chart/public-values.yaml --timeout 600"
 }

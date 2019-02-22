@@ -1,6 +1,7 @@
 watchNamespaces:
   - streaming
   - streaming-prime
+  - streaming-public
 
 resources:
   limits:
