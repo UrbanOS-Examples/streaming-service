@@ -26,14 +26,14 @@ node('infrastructure') {
         }
 
         doStageIfPromoted('Deploy to Staging') {
-            def promotionTag = scos.releaseCandidateNumber()
+            def environment = 'staging'
 
-            scos.withEksCredentials('staging') {
+            scos.withEksCredentials(environment) {
                 deployStrimzi()
                 deployKafka()
             }
 
-            scos.applyAndPushGitHubTag(promotionTag)
+            scos.applyAndPushGitHubTag(environment)
         }
 
         doStageIfRelease('Deploy to Production') {
