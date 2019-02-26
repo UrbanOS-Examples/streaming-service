@@ -1,0 +1,16 @@
+kafka:
+  strimziCluster: streaming-service-public
+  storageSize: 100Gi
+  defaultPartitions: 3
+  defaultReplicas: 2
+  topics:
+  - name: smoke-test
+
+tlsSidecar:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 10Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
