@@ -10,6 +10,7 @@ kafka:
   - name: streaming-raw
   - name: streaming-validated
   - name: streaming-transformed
+  - name: organization-raw
 
 tlsSidecar:
   resources:
