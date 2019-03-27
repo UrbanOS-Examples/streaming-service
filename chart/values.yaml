@@ -1,7 +1,7 @@
 kafka:
   strimziCluster: streaming-service
   storageSize: 100Gi
-  defaultPartitions: 3
+  defaultPartitions: 100
   defaultReplicas: 2
   topics:
   - name: smoke-test
@@ -12,6 +12,14 @@ kafka:
   - name: streaming-transformed
   - name: organization-raw
   - name: streaming-dead-letters
+  resources:
+    requests:
+      cpu: 200m
+      memory: 4Gi
+    limits:
+      cpu: 1000m
+      memory: 6Gi
+
 
 tlsSidecar:
   resources:

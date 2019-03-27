@@ -19,19 +19,14 @@ spec:
       type: persistent-claim
       size: {{ .Values.kafka.storageSize }}
       deleteClaim: false
-    resources:
-      requests:
-        cpu: 100m
-        memory: 2Gi
-      limits:
-        cpu: 500m
-        memory: 2Gi
     readinessProbe:
       initialDelaySeconds: 30
       timeoutSeconds: 15
     livenessProbe:
       initialDelaySeconds: 30
       timeoutSeconds: 15
+    resources:
+{{ toYaml .Values.kafka.resources | indent 6 }}
     rack:
       topologyKey: failure-domain.beta.kubernetes.io/zone
     tlsSidecar:
