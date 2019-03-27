@@ -5,6 +5,14 @@ kafka:
   defaultReplicas: 2
   topics:
   - name: smoke-test
+  resources:
+    requests:
+      cpu: 100m
+      memory: 3Gi
+    limits:
+      cpu: 1000m
+      memory: 4Gi
+
 
 tlsSidecar:
   resources:
