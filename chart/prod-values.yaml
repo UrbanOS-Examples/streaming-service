@@ -1,0 +1,2 @@
+kafka:
+  storageSize: 300Gi
