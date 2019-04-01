@@ -21,7 +21,7 @@ node('infrastructure') {
         doStageUnlessRelease('Deploy to Dev') {
             scos.withEksCredentials('dev') {
                 deployStrimzi()
-                deployKafka()
+                deployKafka('dev')
             }
         }
 
@@ -30,7 +30,7 @@ node('infrastructure') {
 
             scos.withEksCredentials(environment) {
                 deployStrimzi()
-                deployKafka()
+                deployKafka('staging')
             }
 
             scos.applyAndPushGitHubTag(environment)
@@ -42,7 +42,7 @@ node('infrastructure') {
 
             scos.withEksCredentials('prod') {
                 deployStrimzi()
-                deployKafka()
+                deployKafka('prod')
             }
 
             scos.applyAndPushGitHubTag(promotionTag)
@@ -57,7 +57,7 @@ def deployStrimzi() {
     sh "helm upgrade --install strimzi-kafka-operator strimzi/strimzi-kafka-operator --version 0.08.0 -f strimzi-config.yml --namespace strimzi"
 }
 
-def deployKafka() {
-    sh "helm upgrade --install streaming-service-kafka-prime chart/ --namespace streaming-prime --timeout 600"
+def deployKafka(environment) {
+    sh "helm upgrade --install streaming-service-kafka-prime chart/ --namespace streaming-prime --timeout 600 -f chart/${environment}-values.yaml"
     sh "helm upgrade --install streaming-service-kafka-public chart/ --namespace streaming-public -f ./chart/public-values.yaml --timeout 600"
 }
