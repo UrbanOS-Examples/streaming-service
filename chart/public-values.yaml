@@ -2,7 +2,7 @@ kafka:
   strimziCluster: streaming-service-public
   storageSize: 100Gi
   defaultPartitions: 3
-  defaultReplicas: 2
+  defaultReplicas: 3
   topics:
   - name: smoke-test
   resources:
