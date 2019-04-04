@@ -32,7 +32,7 @@ spec:
     tlsSidecar:
 {{ toYaml .Values.tlsSidecar | indent 6 }}
   zookeeper:
-    replicas: 3
+    replicas: {{ .Values.kafka.defaultReplicas }}
     storage:
       type: persistent-claim
       size: 1Gi
