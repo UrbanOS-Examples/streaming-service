@@ -1,4 +1,5 @@
 kafka:
+  broker: streaming-service-public-kafka-bootstrap.streaming-public:9092
   strimziCluster: streaming-service-public
   storageSize: 100Gi
   defaultPartitions: 3
