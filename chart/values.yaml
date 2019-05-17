@@ -16,10 +16,10 @@ kafka:
   - name: streaming-dead-letters
   resources:
     requests:
-      cpu: 400m
+      cpu: 1200m
       memory: 8Gi
     limits:
-      cpu: 1000m
+      cpu: 2000m
       memory: 12Gi
 
 
