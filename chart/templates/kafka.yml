@@ -16,7 +16,7 @@ spec:
       transaction.state.log.min.isr: 2
       auto.create.topics.enable: false
     storage:
-      type: persistent-claim
+      type: {{ .Values.kafka.storageType }}
       size: {{ .Values.kafka.storageSize }}
       deleteClaim: false
     readinessProbe:
@@ -27,14 +27,12 @@ spec:
       timeoutSeconds: 15
     resources:
 {{ toYaml .Values.kafka.resources | indent 6 }}
-    rack:
-      topologyKey: failure-domain.beta.kubernetes.io/zone
     tlsSidecar:
 {{ toYaml .Values.tlsSidecar | indent 6 }}
   zookeeper:
     replicas: {{ .Values.kafka.defaultReplicas }}
     storage:
-      type: persistent-claim
+      type: {{ .Values.zookeeper.storageType }}
       size: 1Gi
       deleteClaim: false
     resources:

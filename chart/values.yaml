@@ -2,6 +2,7 @@ kafka:
   broker: streaming-service-kafka-bootstrap.streaming-prime:9092
   strimziCluster: streaming-service
   storageSize: 100Gi
+  storageType: persistent-claim
   defaultPartitions: 100
   defaultReplicas: 3
   topics:
@@ -22,6 +23,8 @@ kafka:
       cpu: 2000m
       memory: 12Gi
 
+zookeeper:
+  storageType: persistent-claim
 
 tlsSidecar:
   resources:
