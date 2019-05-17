@@ -1,2 +1,9 @@
 kafka:
   storageSize: 200Gi
+  resources:
+    requests:
+      cpu: 200m
+      memory: 5Gi
+    limits:
+      cpu: 1000m
+      memory: 6Gi
