@@ -24,6 +24,18 @@ tlsSidecar:
       cpu: 100m
       memory: 128Mi
 
-tolerations: []
+tolerations:
+- key: scos.run.kafka
+  operator: Equal
+  value: 'false'
+  effect: NoExecute
 
-affinity: {}
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: scos.run.kafka
+          operator: NotIn
+          values:
+          - "true"
