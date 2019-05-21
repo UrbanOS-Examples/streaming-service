@@ -32,3 +32,8 @@ spec:
             requests:
               memory: 128Mi
               cpu: 100m
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+      affinity:
+{{ toYaml .Values.affinity | indent 8 }}
+
