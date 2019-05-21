@@ -17,10 +17,10 @@ kafka:
   resources:
     requests:
       cpu: 1200m
-      memory: 14.5Gi
+      memory: 14500M
     limits:
       cpu: 2000m
-      memory: 14.5Gi
+      memory: 14500M
 
 
 tlsSidecar:
