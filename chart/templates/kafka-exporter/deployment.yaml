@@ -27,11 +27,11 @@ spec:
           imagePullPolicy: IfNotPresent
           resources:
             limits:
-              memory: 128Mi
-              cpu: 300m
+              memory: 1Gi
+              cpu: 500m
             requests:
-              memory: 128Mi
-              cpu: 100m
+              memory: 512Mi
+              cpu: 300m
       tolerations:
 {{ toYaml .Values.tolerations | indent 8 }}
       affinity:
