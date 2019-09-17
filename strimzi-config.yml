@@ -8,3 +8,6 @@ resources:
     cpu: 100m
   requests:
     cpu: 10m
+
+logLevel: DEBUG
+
