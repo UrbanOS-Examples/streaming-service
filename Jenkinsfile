@@ -55,6 +55,8 @@ def deployStrimzi() {
     sh "helm init --service-account tiller"
     sh "helm repo add strimzi http://strimzi.io/charts/"
     sh "helm upgrade --install strimzi-kafka-operator strimzi/strimzi-kafka-operator --version 0.12.2 -f strimzi-config.yml --namespace strimzi"
+    sh "kubectl patch Kafka streaming-service-public -n streaming-public --type merge --patch '$(cat k8s/kafka_version_patch.yml)'"
+    sh "kubectl patch Kafka streaming-service -n streaming-prime --type merge --patch '$(cat k8s/kafka_version_patch.yml)'"
 }
 
 def deployKafka(environment) {
