@@ -1,4 +1,4 @@
-rm replicas.txt
+rm -f replicas.txt
 
 scaleAppToIn () {
    kubectl scale --replicas=$2 deployment/$1 -n $3
