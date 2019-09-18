@@ -4,6 +4,7 @@ metadata:
   name: "{{ .Values.kafka.strimziCluster }}"
 spec:
   kafka:
+    version: {{ .Values.kafka.version }}
     replicas: {{ .Values.kafka.defaultReplicas }}
     listeners:
       plain: {}
