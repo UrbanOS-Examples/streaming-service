@@ -2,8 +2,8 @@
 
 echo
 echo "Deleting old Stateful Sets:"
-# kubectl delete sts streaming-service-public-kafka -n streaming-public --cascade=false
-# kubectl delete sts streaming-service-kafka -n streaming-prime --cascade=false
+kubectl delete sts streaming-service-public-kafka -n streaming-public --cascade=false
+kubectl delete sts streaming-service-kafka -n streaming-prime --cascade=false
 
 start_time="$(date -u +%s)"
 elapsed="$(($end_time-$start_time))"
