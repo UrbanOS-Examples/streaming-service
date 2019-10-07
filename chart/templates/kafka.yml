@@ -66,7 +66,3 @@ spec:
           memory: 512Mi
     tlsSidecar:
 {{ toYaml .Values.tlsSidecar | indent 6 }}
-    tolerations:
-{{ toYaml .Values.tolerations | indent 6 }}
-    affinity:
-{{ toYaml .Values.affinity | indent 6 }}
