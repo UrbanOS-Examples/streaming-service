@@ -6,16 +6,13 @@ kafka:
   defaultPartitions: 1
   defaultReplicas: 3
   topics:
-  - name: smoke-test
-  - name: dataset-registry
-  - name: streaming-og
-  - name: streaming-raw
-  - name: streaming-validated
-  - name: streaming-transformed
-  - name: organization-raw
-  - name: streaming-persisted
-  - name: streaming-dead-letters
-  - name: event-stream
+    - name: smoke-test
+    - name: dataset-registry
+    - name: streaming-raw
+    - name: streaming-transformed
+    - name: streaming-persisted
+    - name: streaming-dead-letters
+    - name: event-stream
   resources:
     requests:
       cpu: 1590m
@@ -35,17 +32,17 @@ tlsSidecar:
       memory: 128Mi
 
 tolerations:
-- key: scos.run.kafka
-  operator: Equal
-  value: 'true'
-  effect: NoExecute
+  - key: scos.run.kafka
+    operator: Equal
+    value: "true"
+    effect: NoExecute
 
 affinity:
   nodeAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       nodeSelectorTerms:
-      - matchExpressions:
-        - key: scos.run.kafka
-          operator: In
-          values:
-          - 'true'
+        - matchExpressions:
+            - key: scos.run.kafka
+              operator: In
+              values:
+                - "true"
