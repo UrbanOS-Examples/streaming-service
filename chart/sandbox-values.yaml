@@ -1,5 +1,4 @@
 kafka:
-  defaultReplicas: 1
   storageSize: 100Gi
   resources:
     requests:
