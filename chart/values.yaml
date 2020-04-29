@@ -15,11 +15,11 @@ kafka:
     - name: event-stream
   resources:
     requests:
-      cpu: 1590m
-      memory: 15000M
+      cpu: 1400m
+      memory: 12500M
     limits:
-      cpu: 1590m
-      memory: 15000M
+      cpu: 1400m
+      memory: 12500M
 
 
 tlsSidecar:
