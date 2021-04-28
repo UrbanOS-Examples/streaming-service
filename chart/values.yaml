@@ -1,5 +1,5 @@
 kafka:
-  version: 2.3.0
+  version: 2.3.1
   broker: streaming-service-kafka-bootstrap.streaming-prime:9092
   strimziCluster: streaming-service
   storageSize: 100Gi
