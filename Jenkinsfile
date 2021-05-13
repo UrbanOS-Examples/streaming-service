@@ -52,11 +52,10 @@ node('infrastructure') {
 
 def deployStrimzi() {
     sh "kubectl apply -f k8s/namespace.yaml"
-    sh "helm init --service-account tiller"
     sh "helm repo add strimzi http://strimzi.io/charts/"
     sh "helm upgrade --install strimzi-kafka-operator strimzi/strimzi-kafka-operator --version 0.15.0 -f strimzi-config.yml --namespace strimzi"
 }
 
 def deployKafka(environment) {
-    sh "helm upgrade --install streaming-service-kafka-prime chart/ --namespace streaming-prime --timeout 600 -f chart/${environment}-values.yaml"
+    sh "helm upgrade --install streaming-service-kafka-prime chart/ --namespace streaming-prime --timeout 600s -f chart/${environment}-values.yaml"
 }
