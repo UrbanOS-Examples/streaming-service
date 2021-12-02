@@ -28,8 +28,8 @@ spec:
           resources:
             limits:
               memory: 1Gi
-              cpu: 500m
+              cpu: 2
             requests:
               memory: 512Mi
-              cpu: 300m
+              cpu: 2
 
